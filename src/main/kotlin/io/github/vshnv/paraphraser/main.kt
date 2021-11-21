@@ -2,12 +2,13 @@ package io.github.vshnv.paraphraser
 
 import ApplicationTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -37,7 +38,7 @@ private val INITIAL_SOURCE = """
 @Preview
 fun App(translator: Translator) {
     var text by remember { mutableStateOf(INITIAL_SOURCE) }
-    val bytecode  by remember(text) { mutableStateOf(translator.translate(text)) }
+    val bytecode by remember(text) { mutableStateOf(translator.translate(text)) }
     ApplicationTheme {
         Row(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -57,11 +58,28 @@ fun App(translator: Translator) {
 
 @Composable
 fun CodeBlock(background: Color, textColor: Color, text: String, setText: (String) -> Unit) {
-    BasicTextField(
-        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp)).background(background).padding(5.dp).padding(5.dp),
-        value = text,
-        onValueChange = setText,
-        textStyle = TextStyle(fontFamily = firaCode, color = textColor)
+    val scrollStateHorizontal = rememberScrollState(0)
+    val scrollStateVertical = rememberScrollState(0)
+
+
+    Row(modifier = Modifier.fillMaxHeight(0.99f).fillMaxWidth()) {
+        BasicTextField(
+            modifier = Modifier.fillMaxHeight().fillMaxWidth(0.99f).clip(RoundedCornerShape(10.dp))
+                .background(background).padding(5.dp).padding(5.dp).horizontalScroll(scrollStateHorizontal).verticalScroll(scrollStateVertical),
+            value = text,
+            onValueChange = setText,
+            textStyle = TextStyle(fontFamily = firaCode, color = textColor)
+        )
+        VerticalScrollbar(
+            modifier = Modifier
+                .fillMaxWidth().fillMaxHeight().fillMaxWidth(),
+            adapter = rememberScrollbarAdapter(scrollStateVertical)
+        )
+    }
+    HorizontalScrollbar(
+        modifier = Modifier
+            .fillMaxWidth().fillMaxHeight().fillMaxWidth(),
+        adapter = rememberScrollbarAdapter(scrollStateHorizontal)
     )
 }
 
