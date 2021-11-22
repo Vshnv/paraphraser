@@ -19,6 +19,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import firaCode
 import io.github.vshnv.paraphraser.compile.*
+import io.github.vshnv.paraphraser.highlight.SyntaxHighlightTranformation
+import io.github.vshnv.paraphraser.highlight.sampleHighlightProperty
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.util.TraceClassVisitor
 import java.io.ByteArrayOutputStream
@@ -35,7 +37,6 @@ private val INITIAL_SOURCE = """
 """.trimIndent()
 
 @Composable
-@Preview
 fun App(translator: Translator) {
     var text by remember { mutableStateOf(INITIAL_SOURCE) }
     val bytecode by remember(text) { mutableStateOf(translator.translate(text)) }
@@ -68,11 +69,12 @@ fun CodeBlock(background: Color, textColor: Color, text: String, setText: (Strin
                 .background(background).padding(5.dp).padding(5.dp).horizontalScroll(scrollStateHorizontal).verticalScroll(scrollStateVertical),
             value = text,
             onValueChange = setText,
-            textStyle = TextStyle(fontFamily = firaCode, color = textColor)
+            textStyle = TextStyle(fontFamily = firaCode, color = textColor),
+            visualTransformation = SyntaxHighlightTranformation(sampleHighlightProperty)
         )
         VerticalScrollbar(
             modifier = Modifier
-                .fillMaxWidth().fillMaxHeight().fillMaxWidth(),
+                .width(5.dp).fillMaxHeight(),
             adapter = rememberScrollbarAdapter(scrollStateVertical)
         )
     }
@@ -90,4 +92,10 @@ fun main() {
             App(javaToBytecodeTranslator)
         }
     }
+}
+
+@Composable
+@Preview
+fun AppPreview() {
+    App{"test"}
 }
